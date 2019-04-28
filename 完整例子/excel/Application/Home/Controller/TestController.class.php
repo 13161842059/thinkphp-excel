@@ -38,25 +38,6 @@ class ExcelController extends CommonController {
     		echo "<pre>";
     		print_r($excel_arr);
     		exit();
-    		$volume = array();
-    		
-    		foreach ($excel_arr as $key=>$val){
-    		    if($val['2']=='军团'){
-    		        $volume[$key] = 2;
-    		    }elseif ($val['2']=='方阵'){
-    		        $volume[$key] = 3;
-    		    }elseif ($val['2']=='战团'){
-    		        $volume[$key] = 4;
-    		    }elseif ($val['2']=='战队'){
-    		        $volume[$key] = 5;
-    		    }
-    		}
-    		array_multisort($volume, SORT_ASC,$excel_arr);
-    		
-    		echo "<pre>";
-    		print_r($excel_arr);
-    		exit();
-            
     	}
     }
 
@@ -84,7 +65,8 @@ class ExcelController extends CommonController {
         $ExcelReader=new \ExcelReader();
         $excel_arr=$ExcelReader->reader_excel($filename);
         echo "<pre>";
-        print_r($excel_arr);exit;
+        print_r($excel_arr);
+        exit;
         
         //数据初始化
         $subjects = array();
@@ -95,10 +77,7 @@ class ExcelController extends CommonController {
         $question_bank = M("question_bank");
         
         $subject_type = $contract_model->getSubjectType();
-//         unset($excel_arr[0]);
-//         unset($excel_arr[count($excel_arr)-1]);
-//         echo "<pre>";
-//         print_r($excel_arr);exit;
+
         foreach ($excel_arr as $key => $value) {
             sleep(0.5);
             $subjects['subject_type'] = isset($value[1])?array_search($value[1],$subject_type):NULL;
@@ -111,21 +90,11 @@ class ExcelController extends CommonController {
             $subjects['subject_title'] = trim($value[8]);
             $subjects['subject_desc'] = trim($value[9]);
 
-//             $wheres['department_name'] = trim($value[0]);
-//             $departmeninfo = $department_model->getDepartment($wheres);
-//             if($departmeninfo){
-//             	$subjects['department_id'] = $departmeninfo['department_id'];
-//             }else{
-//             	$subjects['department_id'] = 0;
-//             }
             $subjects['department_id'] = 1;
             
             $subjects['class_type'] = 1; //题库类型：1=政策保障班，2=第一阶段，3=第二阶段，4=第三阶段
             $subjects['create_time'] = date('Y-m-d H:i:s',time());
 
-//             $subject_list[] = $subjects;
-            
-            
             //考试试题导入
             $result = $question_bank->data($subjects)->add();
             if($result){
@@ -134,11 +103,7 @@ class ExcelController extends CommonController {
                 $insert_count[] = $result;
             }
         }
-        
-        
-//         echo "<pre>";
-//         print_r($subject_list);
-//         exit();
+
         echo '成功导入'.count($insert_count).'条数据';
         exit();
         
